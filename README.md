@@ -54,4 +54,4 @@ npx expo start --clear
 # Rewrite code recursively with proper formatting
 npm run format
 ```
-
+# SpaceMonkey2474: added to verify git and github are working
