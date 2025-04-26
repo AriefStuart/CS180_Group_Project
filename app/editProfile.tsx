@@ -1,12 +1,12 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from "react-native";
+import EditProfile from "@/components/editProfile/EditProfile";
 
 const editProfile = () => {
   return (
-    <View>
-      <Text>editProfile</Text>
+    <View className="bg-white">
+      <EditProfile />
     </View>
-  )
-}
+  );
+};
 
-export default editProfile
+export default editProfile;
