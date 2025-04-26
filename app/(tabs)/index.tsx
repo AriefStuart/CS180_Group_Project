@@ -1,7 +1,5 @@
-import CreateProfileButton from "@/components/home/CreateProfileButton"
+import CreateProfileButton from "@/components/home/CreateProfileButton";
 
 export default function Index() {
-  return (
-    <CreateProfileButton />
-  );
+  return <CreateProfileButton />;
 }
