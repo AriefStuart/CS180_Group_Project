@@ -28,6 +28,32 @@ npm i <dependency>
 npm un <dependency>
 ```
 
+### Workflow
+
+```bash
+# How to pull from github and push your work for review: 
+#Always pull from dev branch first: 
+git pull origin dev
+
+# Make sure you are in the dev branch before creating and going to your own branch: 
+git checkout -b yourGithubName/issueName
+
+# Start coding
+#Run Prettier to format your code 
+npm run format
+
+# Stage your changes 
+git add . 
+
+# Commit your changes 
+git commit -m "short message"
+
+# Push your changes 
+git push origin <yourBranch>
+
+# Check github repo for your pushed changes and make Pull Request (PR)
+```
+
 ### Installing Expo
 
 ```bash
