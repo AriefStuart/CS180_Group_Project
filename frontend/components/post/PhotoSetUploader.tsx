@@ -1,9 +1,16 @@
 import { useState } from "react";
-import { Button, Image, View, FlatList, TouchableOpacity, Text, StyleSheet } from "react-native";
+import {
+  Button,
+  Image,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
-const PhotoSetUploader = () => 
-{
+const PhotoSetUploader = () => {
   // Array to hold the selected photos
   const [photos, setPhotos] = useState<string[]>([]);
 
@@ -18,15 +25,13 @@ const PhotoSetUploader = () =>
     });
 
     // Add photo to the array if not canceled
-    if (!result.canceled) 
-    {
+    if (!result.canceled) {
       setPhotos((prevPhotos) => [...prevPhotos, result.assets[0].uri]);
     }
   };
 
-    // Code to remove a photo from the array
-  const removePhoto = (index: number) => 
-  {
+  // Code to remove a photo from the array
+  const removePhoto = (index: number) => {
     setPhotos((prevPhotos) => prevPhotos.filter((_, i) => i !== index));
   };
 

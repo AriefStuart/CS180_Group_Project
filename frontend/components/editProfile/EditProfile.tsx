@@ -13,11 +13,11 @@ import CameraIcon from "@/assets/images/editProfile/camera-icon.svg";
 import { useRouter } from "expo-router";
 
 const EditProfile = () => {
-    const router = useRouter();
+  const router = useRouter();
   const [fullName, setFullName] = useState("Aryan Goel");
   const [username, setUsername] = useState("agoel27");
   const [bio, setBio] = useState(
-    "Hello there! My name is Aryan and I love thai food!"
+    "Hello there! My name is Aryan and I love thai food!",
   );
   const [profileImage, setProfileImage] = useState(ProfilePic);
 
@@ -65,7 +65,14 @@ const EditProfile = () => {
 
       <View className="items-center mt-4">
         <View className="relative">
-          <Image source={typeof profileImage === "string" ? { uri: profileImage } : profileImage} className="w-32 h-32 rounded-full" />
+          <Image
+            source={
+              typeof profileImage === "string"
+                ? { uri: profileImage }
+                : profileImage
+            }
+            className="w-32 h-32 rounded-full"
+          />
           <TouchableOpacity
             onPress={handleChangePhoto}
             className="absolute -bottom-4 -right-4 bg-white rounded-full"
