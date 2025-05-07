@@ -1,4 +1,4 @@
-# CS180_Group_Project
+# DO NOT MERGE THIS BRANCH, use for UML Diagram Storage
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23407ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![React Native](https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
