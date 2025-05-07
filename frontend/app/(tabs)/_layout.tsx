@@ -1,15 +1,15 @@
 import { Tabs } from "expo-router";
 import { Image } from "react-native";
-import HomeIcon from "@/assets/images/Home.png";
-import HomeIconActive from "@/assets/images/Home (Clicked).png";
-import FriendsIcon from "@/assets/images/Friends.png";
-import FriendsIconActive from "@/assets/images/People.png";
-import PostIcon from "@/assets/images/Create.png";
-import PostIconActive from "@/assets/images/Create (Clicked).png";
-import ChatIcon from "@/assets/images/Message.png";
-import ChatIconActive from "@/assets/images/Message (Clicked).png";
-import ProfileIcon from "@/assets/images/profile picture.png";
-import ProfileIconActive from "@/assets/images/profile picture (clicked).png";
+import HomeIcon from "@/assets/images/navbar/Home.png";
+import HomeIconActive from "@/assets/images/navbar/Home (Clicked).png";
+import FriendsIcon from "@/assets/images/navbar/Friends.png";
+import FriendsIconActive from "@/assets/images/navbar/People.png";
+import PostIcon from "@/assets/images/navbar/Create.png";
+import PostIconActive from "@/assets/images/navbar/Create (Clicked).png";
+import ChatIcon from "@/assets/images/navbar/Message.png";
+import ChatIconActive from "@/assets/images/navbar/Message (Clicked).png";
+import ProfileIcon from "@/assets/images/navbar/profile picture.png";
+import ProfileIconActive from "@/assets/images/navbar/profile picture (clicked).png";
 
 const _Layout = () => {
   return (

@@ -18,6 +18,9 @@ Our app runs on Node.js Version 20.10.0 and higher. Please ensure you have Node.
 ### Dependencies
 
 ```bash
+# Move to frontend directory
+cd frontend
+
 # Install dependencies
 npm i
 
@@ -57,6 +60,9 @@ git push origin <yourBranch>
 ### Installing Expo
 
 ```bash
+# Move to frontend directory
+cd frontend
+
 # Our app uses Expo which is a React Native Framework
 npm install -g expo-cli
 
@@ -67,6 +73,9 @@ expo --version
 ### Running the App Locally
 
 ```bash
+# Move to frontend directory
+cd frontend
+
 # Download the Expo Go app and create an account
 npx expo start
 
@@ -77,6 +86,9 @@ npx expo start --clear
 ### Formatting Code via Prettier
 
 ```bash
+# Move to frontend directory
+cd frontend
+
 # Rewrite code recursively with proper formatting
 npm run format
 ```
