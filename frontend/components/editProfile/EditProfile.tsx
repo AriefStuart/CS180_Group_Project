@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,25 +6,82 @@ import {
   TouchableOpacity,
   Image,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import ProfilePic from "@/assets/images/profile/profilePic.webp";
+import ProfilePic from "@/assets/images/profile/default_profile_picture.jpg";
 import CameraIcon from "@/assets/images/editProfile/camera-icon.svg";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EditProfile = () => {
   const router = useRouter();
-  const [fullName, setFullName] = useState("Aryan Goel");
-  const [username, setUsername] = useState("agoel27");
-  const [bio, setBio] = useState(
-    "Hello there! My name is Aryan and I love thai food!",
-  );
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
   const [profileImage, setProfileImage] = useState(ProfilePic);
+  const [loading, setLoading] = useState(true);
 
-  const handleSave = () => {
-    console.log("Profile saved:", { fullName, username, bio });
-    // Add your save logic here
-    router.back();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = await AsyncStorage.getItem("userId");
+        if (!userId) {
+          console.error("User ID not found");
+          return;
+        }
+
+        const response = await fetch(`http://10.13.129.5:5000/get/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFullName(data.fullname);
+          setUsername(data.username);
+          setBio(data.bio || "");
+        } else {
+          console.error("Failed to fetch user data");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) {
+        console.error("User ID not found");
+        return;
+      }
+      const response = await fetch(`http://10.13.129.5:5000/update/${userId}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullname: fullName,
+          username: username,
+          password: "placeholder_password", // Replace with actual password logic
+          bio: bio,
+        }),
+      });
+
+      if (response.ok) {
+        Alert.alert("Success", "Profile updated successfully!");
+        router.back();
+      } else {
+        const errorData = await response.json();
+        console.error("Error updating profile:", errorData);
+        Alert.alert("Error", errorData.message || "Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "An error occurred while updating the profile.");
+    }
   };
 
   const handleCancel = () => {
@@ -50,6 +107,14 @@ const EditProfile = () => {
       setProfileImage(result.assets[0].uri);
     }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center">
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex mx-4">

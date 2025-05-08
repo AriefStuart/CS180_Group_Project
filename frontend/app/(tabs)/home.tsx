@@ -1,5 +1,5 @@
 import CreateProfileButton from "@/components/home/CreateProfileButton";
 
-export default function Index() {
+export default function Home() {
   return <CreateProfileButton />;
 }
