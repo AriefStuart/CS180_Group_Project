@@ -57,18 +57,21 @@ const EditProfile = () => {
         console.error("User ID not found");
         return;
       }
-      const response = await fetch(`http://10.13.129.5:5000/update/${userId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `http://10.13.129.5:5000/update/${userId}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullname: fullName,
+            username: username,
+            password: "placeholder_password", // Replace with actual password logic
+            bio: bio,
+          }),
         },
-        body: JSON.stringify({
-          fullname: fullName,
-          username: username,
-          password: "placeholder_password", // Replace with actual password logic
-          bio: bio,
-        }),
-      });
+      );
 
       if (response.ok) {
         Alert.alert("Success", "Profile updated successfully!");

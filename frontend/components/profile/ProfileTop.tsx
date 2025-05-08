@@ -22,7 +22,7 @@ const ProfileTop = () => {
             console.error("User ID not found");
             return;
           }
-  
+
           const response = await fetch(`http://10.13.129.5:5000/get/${userId}`);
           if (response.ok) {
             const data = await response.json();
@@ -38,11 +38,10 @@ const ProfileTop = () => {
           setLoading(false);
         }
       };
-  
+
       fetchUserData();
-    }, [])
+    }, []),
   );
-  
 
   if (loading) {
     return (
@@ -57,10 +56,14 @@ const ProfileTop = () => {
       <Text className="text-2xl font-bold">Profile</Text>
       <Link href="/editProfile" asChild>
         <TouchableOpacity>
-        <Image
-          source={typeof profileImage === "string" ? { uri: profileImage } : profileImage}
-          className="w-32 h-32 mt-4 rounded-full"
-        />
+          <Image
+            source={
+              typeof profileImage === "string"
+                ? { uri: profileImage }
+                : profileImage
+            }
+            className="w-32 h-32 mt-4 rounded-full"
+          />
         </TouchableOpacity>
       </Link>
       <Link href="/editProfile" asChild>
@@ -74,15 +77,15 @@ const ProfileTop = () => {
         </TouchableOpacity>
       </Link>
       <Link href="/editProfile" asChild>
-      {bio === "" ? (
-        <TouchableOpacity className="mt-1 bg-app-primary rounded-full px-4 py-1 flex items-center">
-          <Text className="text-white font-extrabold text-xs">+ Add bio</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity className="px-4 py-1 flex items-center">
-          <Text className="text-app-gray text-sm">{bio}</Text>
-        </TouchableOpacity>
-      )}
+        {bio === "" ? (
+          <TouchableOpacity className="mt-1 bg-app-primary rounded-full px-4 py-1 flex items-center">
+            <Text className="text-white font-extrabold text-xs">+ Add bio</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity className="px-4 py-1 flex items-center">
+            <Text className="text-app-gray text-sm">{bio}</Text>
+          </TouchableOpacity>
+        )}
       </Link>
       <View className="flex-row justify-around w-full mt-5">
         <View className="items-center">

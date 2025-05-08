@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const CreateProfile = () => {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
@@ -34,7 +33,10 @@ const CreateProfile = () => {
         } else {
           const errorData = await response.json();
           console.error("Error creating profile:", errorData);
-          Alert.alert("Error", errorData.message || "Failed to create profile.");
+          Alert.alert(
+            "Error",
+            errorData.message || "Failed to create profile.",
+          );
         }
       } catch (error) {
         console.error("Error:", error);
