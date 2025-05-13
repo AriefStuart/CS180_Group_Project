@@ -20,12 +20,14 @@ const RoundedButton = ({
       <TouchableOpacity
         className={`px-4 py-4 ${color} ${borderRadius} flex-row items-center self-start`}
       >
-        <Text className="text-black items-center font-bold text-base">{text}
-        {isX && (
-        <View className="">
-          <X size={30} color="black" />
-        </View>
-      )}        </Text>
+        <Text className="text-black items-center font-bold text-base">
+          {text}
+          {isX && (
+            <View className="">
+              <X size={30} color="black" />
+            </View>
+          )}{" "}
+        </Text>
       </TouchableOpacity>
     </View>
   );
