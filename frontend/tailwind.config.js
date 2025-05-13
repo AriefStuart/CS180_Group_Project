@@ -7,6 +7,7 @@ module.exports = {
       colors: {
         "app-primary": "#4793AF",
         "app-secondary": "#DD5746",
+        "app-3": "#90D5FF",
       },
       fontFamily: {
         poppins: ["Poppins-Regular"],
