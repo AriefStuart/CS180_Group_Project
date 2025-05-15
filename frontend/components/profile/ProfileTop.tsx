@@ -3,14 +3,14 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
-import ProfilePic from "@/assets/images/profile/default_profile_picture.jpg";
+import DefaultProfilePic from "@/assets/images/profile/default_profile_picture.jpg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileTop = () => {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
-  const [profileImage, setProfileImage] = useState(ProfilePic);
+  const [profileImage, setProfileImage] = useState(DefaultProfilePic);
   const [loading, setLoading] = useState(true);
 
   useFocusEffect(
@@ -23,12 +23,13 @@ const ProfileTop = () => {
             return;
           }
 
-          const response = await fetch(`http://10.13.129.5:5000/get/${userId}`);
+          const response = await fetch(`http://127.0.0.1:5000/get/${userId}`);
           if (response.ok) {
             const data = await response.json();
             setFullName(data.fullname);
             setUsername(data.username);
             setBio(data.bio || "");
+            setProfileImage(data.profile_picture || DefaultProfilePic);
           } else {
             console.error("Failed to fetch user data");
           }

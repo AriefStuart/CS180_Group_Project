@@ -12,7 +12,7 @@ const CreateProfile = () => {
   const handleSubmit = async () => {
     if (fullName && username && password) {
       try {
-        const response = await fetch("http://10.13.129.5:5000/add", {
+        const response = await fetch("http://127.0.0.1:5000/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

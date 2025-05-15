@@ -4,3 +4,5 @@ mysqlclient
 flask-marshmallow
 marshmallow-sqlalchemy
 pymysql
+flask-cors
+boto3
