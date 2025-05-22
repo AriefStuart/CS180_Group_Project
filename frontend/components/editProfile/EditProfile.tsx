@@ -64,18 +64,18 @@ const EditProfile = () => {
       try {
         const response = await fetch(profileImage);
         const blob = await response.blob();
-  
+
         const s3 = new AWS.S3();
         const params = {
-          Bucket: "cs180-bucket", 
-          Key: `profile-images/${Date.now()}-${profileImage.split("/").pop()}`, 
+          Bucket: "cs180-bucket",
+          Key: `profile-images/${Date.now()}-${profileImage.split("/").pop()}`,
           Body: blob,
-          ContentType: "image/jpg", 
+          ContentType: "image/jpg",
         };
-  
+
         const uploadResult = await s3.upload(params).promise();
         console.log("Image uploaded successfully:", uploadResult.Location);
-  
+
         userData = {
           fullname: fullName,
           username: username,
@@ -94,23 +94,20 @@ const EditProfile = () => {
         profile_picture: null,
       };
     }
-    
+
     try {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) {
         console.error("User ID not found");
         return;
       }
-      const response = await fetch(
-        `http://127.0.0.1:5000/update/${userId}/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userData),
+      const response = await fetch(`http://127.0.0.1:5000/update/${userId}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(userData),
+      });
 
       if (response.ok) {
         Alert.alert("Success", "Profile updated successfully!");

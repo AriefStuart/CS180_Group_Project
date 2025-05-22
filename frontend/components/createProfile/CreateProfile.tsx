@@ -78,6 +78,12 @@ const CreateProfile = () => {
       >
         <Text className="text-white font-bold">Submit</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => router.push("/login")}
+        className="bg-gray-300 px-4 py-4 rounded-full"
+      >
+        <Text className="text-black font-bold">Go to Login</Text>
+      </TouchableOpacity>
     </View>
   );
 };

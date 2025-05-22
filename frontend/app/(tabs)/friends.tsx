@@ -1,10 +1,8 @@
-import { View, Text } from "react-native";
+import FriendSearch from "@/components/friends/FriendSearch";
 
 const friends = () => {
   return (
-    <View className="flex-1 justify-center items-center">
-      <Text>Friends</Text>
-    </View>
+    <FriendSearch />
   );
 };
 

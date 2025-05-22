@@ -1,5 +1,5 @@
-import CreateProfileButton from "@/components/home/CreateProfileButton";
+import AllPosts from "@/components/home/AllPosts";
 
 export default function Home() {
-  return <CreateProfileButton />;
+  return <AllPosts />;
 }
