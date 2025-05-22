@@ -1,17 +1,18 @@
 import { useState, useCallback } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
-import ProfilePic from "@/assets/images/profile/default_profile_picture.jpg";
+import DefaultProfilePic from "@/assets/images/profile/default_profile_picture.jpg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileTop = () => {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
-  const [profileImage, setProfileImage] = useState(ProfilePic);
+  const [profileImage, setProfileImage] = useState(DefaultProfilePic);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useFocusEffect(
     useCallback(() => {
@@ -23,12 +24,13 @@ const ProfileTop = () => {
             return;
           }
 
-          const response = await fetch(`http://10.13.129.5:5000/get/${userId}`);
+          const response = await fetch(`http://127.0.0.1:5000/get/${userId}`);
           if (response.ok) {
             const data = await response.json();
             setFullName(data.fullname);
             setUsername(data.username);
             setBio(data.bio || "");
+            setProfileImage(data.profile_picture || DefaultProfilePic);
           } else {
             console.error("Failed to fetch user data");
           }
@@ -52,8 +54,16 @@ const ProfileTop = () => {
   }
 
   return (
-    <SafeAreaView className="flex items-center">
-      <Text className="text-2xl font-bold">Profile</Text>
+    <SafeAreaView className="relative flex items-center">
+      <Text className="font-bold text-2xl">Profile</Text>
+      <TouchableOpacity
+        onPress={() => router.replace("/")}
+        className="absolute right-5 top-0"
+      >
+        <Text className="text-app-secondary font-bold text-2xl pl-5">
+          Logout
+        </Text>
+      </TouchableOpacity>
       <Link href="/editProfile" asChild>
         <TouchableOpacity>
           <Image

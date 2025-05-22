@@ -12,7 +12,7 @@ const CreateProfile = () => {
   const handleSubmit = async () => {
     if (fullName && username && password) {
       try {
-        const response = await fetch("http://10.13.129.5:5000/add", {
+        const response = await fetch("http://127.0.0.1:5000/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -77,6 +77,12 @@ const CreateProfile = () => {
         className="bg-app-primary px-4 py-4 rounded-full"
       >
         <Text className="text-white font-bold">Submit</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => router.push("/login")}
+        className="bg-gray-300 px-4 py-4 rounded-full"
+      >
+        <Text className="text-black font-bold">Go to Login</Text>
       </TouchableOpacity>
     </View>
   );

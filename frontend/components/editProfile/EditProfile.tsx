@@ -9,17 +9,24 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import ProfilePic from "@/assets/images/profile/default_profile_picture.jpg";
+import DefaultProfilePic from "@/assets/images/profile/default_profile_picture.jpg";
 import CameraIcon from "@/assets/images/editProfile/camera-icon.svg";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AWS from "aws-sdk";
+
+AWS.config.update({
+  accessKeyId: "AKIAR62QE2Z5XGNIKUER",
+  secretAccessKey: "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",
+  region: "us-west-1",
+});
 
 const EditProfile = () => {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
-  const [profileImage, setProfileImage] = useState(ProfilePic);
+  const [profileImage, setProfileImage] = useState(DefaultProfilePic);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,12 +38,13 @@ const EditProfile = () => {
           return;
         }
 
-        const response = await fetch(`http://10.13.129.5:5000/get/${userId}`);
+        const response = await fetch(`http://127.0.0.1:5000/get/${userId}`);
         if (response.ok) {
           const data = await response.json();
           setFullName(data.fullname);
           setUsername(data.username);
           setBio(data.bio || "");
+          setProfileImage(data.profile_image || DefaultProfilePic);
         } else {
           console.error("Failed to fetch user data");
         }
@@ -51,27 +59,55 @@ const EditProfile = () => {
   }, []);
 
   const handleSave = async () => {
+    let userData = {};
+    if (profileImage !== DefaultProfilePic) {
+      try {
+        const response = await fetch(profileImage);
+        const blob = await response.blob();
+
+        const s3 = new AWS.S3();
+        const params = {
+          Bucket: "cs180-bucket",
+          Key: `profile-images/${Date.now()}-${profileImage.split("/").pop()}`,
+          Body: blob,
+          ContentType: "image/jpg",
+        };
+
+        const uploadResult = await s3.upload(params).promise();
+        console.log("Image uploaded successfully:", uploadResult.Location);
+
+        userData = {
+          fullname: fullName,
+          username: username,
+          bio: bio,
+          profile_picture: uploadResult.Location,
+        };
+      } catch (error) {
+        console.error("Error uploading image to S3:", error);
+        Alert.alert("Error", "Failed to upload image. Please try again.");
+      }
+    } else {
+      userData = {
+        fullname: fullName,
+        username: username,
+        bio: bio,
+        profile_picture: null,
+      };
+    }
+
     try {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) {
         console.error("User ID not found");
         return;
       }
-      const response = await fetch(
-        `http://10.13.129.5:5000/update/${userId}/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fullname: fullName,
-            username: username,
-            password: "placeholder_password", // Replace with actual password logic
-            bio: bio,
-          }),
+      const response = await fetch(`http://127.0.0.1:5000/update/${userId}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(userData),
+      });
 
       if (response.ok) {
         Alert.alert("Success", "Profile updated successfully!");
@@ -107,7 +143,8 @@ const EditProfile = () => {
     console.log(result);
 
     if (!result.canceled) {
-      setProfileImage(result.assets[0].uri);
+      const imageUri = result.assets[0].uri;
+      setProfileImage(imageUri);
     }
   };
 
