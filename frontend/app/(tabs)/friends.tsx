@@ -1,9 +1,7 @@
 import FriendSearch from "@/components/friends/FriendSearch";
 
 const friends = () => {
-  return (
-    <FriendSearch />
-  );
+  return <FriendSearch />;
 };
 
 export default friends;

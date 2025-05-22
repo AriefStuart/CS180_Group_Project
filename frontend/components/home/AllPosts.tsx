@@ -1,4 +1,12 @@
-import { View, Text, Alert, Image, FlatList, Dimensions, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  Image,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -37,7 +45,9 @@ const AllPosts = () => {
         if (!userId) return;
 
         try {
-          const response = await fetch(`http://127.0.0.1:5000/get_posts_for_user_and_friends/${userId}`);
+          const response = await fetch(
+            `http://127.0.0.1:5000/get_posts_for_user_and_friends/${userId}`,
+          );
           if (response.ok) {
             const data = await response.json();
             console.log("Fetched posts:", data);
@@ -56,14 +66,16 @@ const AllPosts = () => {
         if (!userId) return;
 
         try {
-          const response = await fetch(`http://127.0.0.1:5000/get_liked_posts/${userId}`);
+          const response = await fetch(
+            `http://127.0.0.1:5000/get_liked_posts/${userId}`,
+          );
           if (response.ok) {
             const likedPostIds: number[] = await response.json();
             setPosts((prevPosts) =>
               prevPosts.map((post) => ({
                 ...post,
                 liked: likedPostIds.includes(post.post_id), // Mark posts as liked if they are in the likedPostIds array
-              }))
+              })),
             );
           } else {
             console.error("Failed to fetch liked posts");
@@ -86,17 +98,24 @@ const AllPosts = () => {
 
   const toggleLike = async (post_id: number) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/toggle_like/${post_id}/${userId}/`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `http://127.0.0.1:5000/toggle_like/${post_id}/${userId}/`,
+        {
+          method: "POST",
+        },
+      );
       if (response.ok) {
         const updatedPost = await response.json();
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
             post.post_id === post_id
-              ? { ...post, like_count: updatedPost.like_count, liked: updatedPost.liked }
-              : post
-          )
+              ? {
+                  ...post,
+                  like_count: updatedPost.like_count,
+                  liked: updatedPost.liked,
+                }
+              : post,
+          ),
         );
       } else {
         console.error("Failed to toggle like");

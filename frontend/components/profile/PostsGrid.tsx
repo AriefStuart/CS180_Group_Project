@@ -1,5 +1,14 @@
 import { useState, useCallback } from "react";
-import { View, Text, Image, FlatList, Alert, Modal, TouchableOpacity, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  Alert,
+  Modal,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -85,7 +94,10 @@ const PostsGrid = () => {
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => openModal(item)}>
             <View className="m-1">
-              <Image source={{ uri: item.picture_link }} className="w-32 h-32 rounded-lg" />
+              <Image
+                source={{ uri: item.picture_link }}
+                className="w-32 h-32 rounded-lg"
+              />
             </View>
           </TouchableOpacity>
         )}

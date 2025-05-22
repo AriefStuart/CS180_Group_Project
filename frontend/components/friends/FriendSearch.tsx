@@ -1,4 +1,11 @@
-import { View, Text, TextInput, FlatList, Alert, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
@@ -40,7 +47,9 @@ const FriendSearch = () => {
         if (!userId) return;
 
         try {
-          const response = await fetch(`http://127.0.0.1:5000/get_users_excluding_me?user_id=${userId}`); // Pass userId as a query parameter
+          const response = await fetch(
+            `http://127.0.0.1:5000/get_users_excluding_me?user_id=${userId}`,
+          ); // Pass userId as a query parameter
           if (response.ok) {
             const data = await response.json();
             console.log("Fetched users:", data);
@@ -57,15 +66,15 @@ const FriendSearch = () => {
       };
 
       fetchUsers();
-    }, [userId])
+    }, [userId]),
   );
 
   // Update filtered users when the search query changes
   useEffect(() => {
     setFilteredUsers(
       users.filter((user) =>
-        user.username.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+        user.username.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
     );
   }, [searchQuery, users]);
 
@@ -86,12 +95,14 @@ const FriendSearch = () => {
       if (response.ok) {
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
-            user.id === friendId ? { ...user, isFriend: !isFriend } : user
-          )
+            user.id === friendId ? { ...user, isFriend: !isFriend } : user,
+          ),
         );
         Alert.alert(
           "Success",
-          isFriend ? "Friend removed successfully!" : "Friend added successfully!"
+          isFriend
+            ? "Friend removed successfully!"
+            : "Friend added successfully!",
         );
       } else {
         Alert.alert("Error", "Failed to update friend status.");

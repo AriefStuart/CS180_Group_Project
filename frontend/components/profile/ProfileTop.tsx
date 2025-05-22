@@ -6,7 +6,6 @@ import { useFocusEffect } from "@react-navigation/native";
 import DefaultProfilePic from "@/assets/images/profile/default_profile_picture.jpg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const ProfileTop = () => {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
@@ -57,8 +56,13 @@ const ProfileTop = () => {
   return (
     <SafeAreaView className="relative flex items-center">
       <Text className="font-bold text-2xl">Profile</Text>
-      <TouchableOpacity onPress={() => router.replace("/")} className="absolute right-5 top-0">
-        <Text className="text-app-secondary font-bold text-2xl pl-5">Logout</Text>
+      <TouchableOpacity
+        onPress={() => router.replace("/")}
+        className="absolute right-5 top-0"
+      >
+        <Text className="text-app-secondary font-bold text-2xl pl-5">
+          Logout
+        </Text>
       </TouchableOpacity>
       <Link href="/editProfile" asChild>
         <TouchableOpacity>
