@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Button, Image, Alert } from "react-native";
+import { View, Text, Button, Image, Alert, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AWS from "aws-sdk";
@@ -90,11 +90,42 @@ const PhotoUploader = () => {
     }
   };
 
+  const removePhoto = () => {
+    setImageUri(null);
+  };
+
   return (
     <View className="flex-1 justify-center items-center">
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       {imageUri && (
-        <Image source={{ uri: imageUri }} className="w-48 h-48 mt-4" />
+        <View style={{ marginTop: 16, position: "relative" }}>
+          <Image
+            source={{ uri: imageUri }}
+            style={{ width: 192, height: 192, borderRadius: 10 }}
+          />
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              backgroundColor: "red",
+              borderRadius: 12,
+              padding: 6,
+              zIndex: 2,
+            }}
+            onPress={removePhoto}
+          >
+            <Text
+              style={{
+                color: "white",
+                fontWeight: "bold",
+                fontSize: 16,
+              }}
+            >
+              X
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
       <Button
         title={uploading ? "Uploading..." : "Upload Photo"}
