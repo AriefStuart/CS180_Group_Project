@@ -36,10 +36,10 @@ class Friendship(db.Model):
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -158,29 +158,32 @@ def decline_friend_request(requester_id):
     # Return a success message
     return jsonify({'message': 'Friend request declined'}), 200
 
-@app.route('/message/<int:receiver_id>', methods=['POST'])
-def send_message(receiver_id):
-    # ID of user who sent the message, and the content it holds
-    sender_id = request.json['sender_id']
-    content = request.json['content']
-
-    # Check if users are friends
-    friendship = Friendship.query.filter(
-        ((Friendship.requester_id == sender_id) & (Friendship.receiver_id == receiver_id) & (Friendship.status == 'accepted')) |
-        ((Friendship.requester_id == receiver_id) & (Friendship.receiver_id == sender_id) & (Friendship.status == 'accepted'))
-    ).first()
-
-    # If users are not friends, deny the message 
-    if not friendship:
-        return jsonify({'error': 'Users are not friends'}), 403
-
-    # Create and save the message
-    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content)
+@app.route('/api/messages', methods=['POST'])
+@login_required
+def send_message():
+    data = request.get_json()
+    receiver_id = data['receiver_id']
+    content = data['content']
+    message = Message(sender_id=current_user.id, receiver_id=receiver_id, content=content)
     db.session.add(message)
     db.session.commit()
+    
+    return jsonify({'status': 'Message sent'})
 
-    # Return a success message
-    return jsonify({'message': 'Message sent'}), 201
+@app.route('/api/messages/<int:friend_id>', methods=['GET'])
+@login_required
+def get_messages(friend_id):
+    messages = Message.query.filter(
+        ((Message.sender_id == current_user.id) & (Message.receiver_id == friend_id)) |
+        ((Message.sender_id == friend_id) & (Message.receiver_id == current_user.id))
+    ).order_by(Message.timestamp.asc()).all()
+    
+    return jsonify([{
+        'sender_id': msg.sender_id,
+        'receiver_id': msg.receiver_id,
+        'content': msg.content,
+        'timestamp': msg.timestamp.isoformat()
+    } for msg in messages])
 
 @app.route('/feed/<int:user_id>', methods=['GET'])
 def get_feed(user_id):
