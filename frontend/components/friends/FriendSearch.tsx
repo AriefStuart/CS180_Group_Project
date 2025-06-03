@@ -114,7 +114,7 @@ const FriendSearch = () => {
   };
 
   return (
-    <View className="flex-1 p-4 bg-white">
+    <View className="flex-1 pt-12 px-4 bg-white">
       <Text className="text-xl font-bold mb-4">Search Friends</Text>
       <TextInput
         className="h-10 border border-gray-300 rounded-lg px-3 mb-4"
