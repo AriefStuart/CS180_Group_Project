@@ -48,7 +48,7 @@ const FriendSearch = () => {
 
         try {
           const response = await fetch(
-            `http://127.0.0.1:5000/get_users_excluding_me?user_id=${userId}`,
+            `${process.env.EXPO_PUBLIC_SERVER_IP}/get_users_excluding_me?user_id=${userId}`,
           ); // Pass userId as a query parameter
           if (response.ok) {
             const data = await response.json();
@@ -87,8 +87,8 @@ const FriendSearch = () => {
 
     try {
       const endpoint = isFriend
-        ? `http://127.0.0.1:5000/remove_friend/${userId}/${friendId}/`
-        : `http://127.0.0.1:5000/add_friend/${userId}/${friendId}/`;
+        ? `${process.env.EXPO_PUBLIC_SERVER_IP}/remove_friend/${userId}/${friendId}/`
+        : `${process.env.EXPO_PUBLIC_SERVER_IP}/add_friend/${userId}/${friendId}/`;
 
       const response = await fetch(endpoint, { method: "POST" });
 

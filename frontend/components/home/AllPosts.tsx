@@ -46,7 +46,7 @@ const AllPosts = () => {
 
         try {
           const response = await fetch(
-            `http://127.0.0.1:5000/get_posts_for_user_and_friends/${userId}`,
+            `${process.env.EXPO_PUBLIC_SERVER_IP}/get_posts_for_user_and_friends/${userId}`,
           );
           if (response.ok) {
             const data = await response.json();
@@ -67,7 +67,7 @@ const AllPosts = () => {
 
         try {
           const response = await fetch(
-            `http://127.0.0.1:5000/get_liked_posts/${userId}`,
+            `${process.env.EXPO_PUBLIC_SERVER_IP}/get_liked_posts/${userId}`,
           );
           if (response.ok) {
             const likedPostIds: number[] = await response.json();
@@ -99,7 +99,7 @@ const AllPosts = () => {
   const toggleLike = async (post_id: number) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/toggle_like/${post_id}/${userId}/`,
+        `${process.env.EXPO_PUBLIC_SERVER_IP}/toggle_like/${post_id}/${userId}/`,
         {
           method: "POST",
         },

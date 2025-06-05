@@ -35,7 +35,7 @@ const PostsGrid = () => {
           }
 
           const response = await fetch(
-            `http://127.0.0.1:5000/get_posts/${userId}/`,
+            `${process.env.EXPO_PUBLIC_SERVER_IP}/get_posts/${userId}/`,
           );
           if (response.ok) {
             const data = await response.json();
