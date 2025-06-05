@@ -54,11 +54,13 @@ const PhotoUploader = () => {
         return;
       }
 
+      const s3 = new AWS.S3();
+      const uploadedLinks: string[] = [];
+
       for (const uri of imageUris) {
         const response = await fetch(uri);
         const blob = await response.blob();
 
-        const s3 = new AWS.S3();
         const s3Params = {
           Bucket: "cs180-bucket",
           Key: `post-images/${Date.now()}-${uri.split("/").pop()}`,
@@ -67,31 +69,32 @@ const PhotoUploader = () => {
         };
 
         const uploadResult = await s3.upload(s3Params).promise();
-        console.log("Image uploaded successfully:", uploadResult.Location);
-
-        const backendResponse = await fetch(
-          `${process.env.EXPO_PUBLIC_SERVER_IP}/add_post`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user_id: userId,
-              picture_link: uploadResult.Location,
-            }),
-          },
-        );
-
-        if (!backendResponse.ok) {
-          const errorData = await backendResponse.json();
-          console.error("Error saving photo to backend:", errorData);
-          Alert.alert("Error", errorData.message || "Failed to save photo.");
-        }
+        uploadedLinks.push(uploadResult.Location);
       }
 
-      Alert.alert("Success", "All photos uploaded successfully!");
-      setImageUris([]); // Reset after upload
+      // Send all links in one request to add_post_set
+      const backendResponse = await fetch(
+        `${process.env.EXPO_PUBLIC_SERVER_IP}/add_post_set`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            picture_links: uploadedLinks,
+          }),
+        },
+      );
+
+      if (!backendResponse.ok) {
+        const errorData = await backendResponse.json();
+        console.error("Error saving photo set to backend:", errorData);
+        Alert.alert("Error", errorData.message || "Failed to save photo set.");
+      } else {
+        Alert.alert("Success", "All photos uploaded successfully!");
+        setImageUris([]); // Reset after upload
+      }
     } catch (error) {
       console.error("Error uploading photos:", error);
       Alert.alert("Error", "An error occurred while uploading the photos.");

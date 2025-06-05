@@ -6,7 +6,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
-import boto3
+from sqlalchemy import func
 
 app = Flask(__name__)
 CORS(app)
@@ -65,11 +65,13 @@ class Posts(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     picture_link = db.Column(db.String(200), nullable=False)
     like_count = db.Column(db.Integer, default=0)
+    post_set_id = db.Column(db.Integer, nullable=True)
 
-    def __init__(self, user_id, picture_link):
+    def __init__(self, user_id, picture_link, post_set_id=None):
         self.user_id = user_id
         self.picture_link = picture_link
         self.like_count = 0
+        self.post_set_id = post_set_id
 
 
 class PostSchema(ma.SQLAlchemyAutoSchema):
@@ -98,27 +100,36 @@ def get_posts_for_user_and_friends(user_id):
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    # Get the user's friends
     friends = user.friends
-
-    # Include the user's own posts and their friends' posts
     posts = Posts.query.filter(
         (Posts.user_id == user.id)
         | (Posts.user_id.in_([friend.id for friend in friends]))
     ).all()
 
-    # Serialize the posts
-    post_list = [
-        {
-            "post_id": post.post_id,
-            "user_id": post.user_id,
-            "picture_link": post.picture_link,
-            "like_count": post.like_count,
-        }
-        for post in posts
-    ]
+    # Get liked post ids for this user
+    liked_post_ids = set(
+        like.post_id for like in Likes.query.filter_by(user_id=user_id).all()
+    )
 
-    return jsonify(post_list)
+    grouped = {}
+    for post in posts:
+        set_id = post.post_set_id or post.post_id
+        if set_id not in grouped:
+            grouped[set_id] = {
+                "post_set_id": set_id,
+                "user_id": post.user_id,
+                "photos": [],
+                "like_counts": [],
+                "post_ids": [],
+                "liked": [],
+            }
+        grouped[set_id]["photos"].append(post.picture_link)
+        grouped[set_id]["like_counts"].append(post.like_count)
+        grouped[set_id]["post_ids"].append(post.post_id)
+        grouped[set_id]["liked"].append(post.post_id in liked_post_ids)
+
+    result = list(grouped.values())
+    return jsonify(result)
 
 
 @app.route("/get_users_excluding_me", methods=["GET"])
@@ -294,6 +305,24 @@ def add_post():
     db.session.add(post)
     db.session.commit()
     return post_schema.jsonify(post)
+
+
+@app.route("/add_post_set", methods=["POST"])
+def add_post_set():
+    user_id = request.json["user_id"]
+    picture_links = request.json["picture_links"]  # Expecting a list
+
+    # Generate a new post_set_id (e.g., max existing + 1)
+    max_post_set_id = db.session.query(func.max(Posts.post_set_id)).scalar()
+    new_post_set_id = (max_post_set_id or 0) + 1
+
+    posts = []
+    for link in picture_links:
+        post = Posts(user_id, link, post_set_id=new_post_set_id)
+        db.session.add(post)
+        posts.append(post)
+    db.session.commit()
+    return posts_schema.jsonify(posts)
 
 
 @app.route("/get_posts/<id>/", methods=["GET"])
