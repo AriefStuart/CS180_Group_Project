@@ -16,9 +16,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AWS from "aws-sdk";
 
 AWS.config.update({
-  accessKeyId: "AKIAR62QE2Z5XGNIKUER",
-  secretAccessKey: "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",
-  region: "us-west-1",
+  accessKeyId: process.env.EXPO_PUBLIC_AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.EXPO_PUBLIC_AWS_SECRET_ACCESS_KEY,
+  region: process.env.EXPO_PUBLIC_AWS_REGION,
 });
 
 const EditProfile = () => {
