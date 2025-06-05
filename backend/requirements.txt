@@ -6,3 +6,4 @@ marshmallow-sqlalchemy
 pymysql
 flask-cors
 boto3
+black

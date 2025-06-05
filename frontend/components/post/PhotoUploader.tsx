@@ -3,13 +3,12 @@ import { View, Text, Button, Image, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AWS from "aws-sdk";
-import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION } from "@env"; // Import from .env
 
 // Configure AWS S3
 AWS.config.update({
-  accessKeyId: AWS_ACCESS_KEY_ID,
-  secretAccessKey: AWS_SECRET_ACCESS_KEY,
-  region: AWS_REGION,
+  accessKeyId: process.env.EXPO_PUBLIC_AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.EXPO_PUBLIC_AWS_SECRET_ACCESS_KEY,
+  region: process.env.EXPO_PUBLIC_AWS_REGION,
 });
 
 const PhotoUploader = () => {
