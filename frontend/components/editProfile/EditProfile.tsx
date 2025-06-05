@@ -38,7 +38,7 @@ const EditProfile = () => {
           return;
         }
 
-        const response = await fetch(`http://127.0.0.1:5000/get/${userId}`);
+        const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/get/${userId}`);
         if (response.ok) {
           const data = await response.json();
           setFullName(data.fullname);
@@ -101,7 +101,7 @@ const EditProfile = () => {
         console.error("User ID not found");
         return;
       }
-      const response = await fetch(`http://127.0.0.1:5000/update/${userId}/`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/update/${userId}/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

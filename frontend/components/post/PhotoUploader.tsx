@@ -61,7 +61,7 @@ const PhotoUploader = () => {
         const uploadResult = await s3.upload(s3Params).promise();
         console.log("Image uploaded successfully:", uploadResult.Location);
 
-        const backendResponse = await fetch("http://127.0.0.1:5000/add_post", {
+        const backendResponse = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/add_post`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

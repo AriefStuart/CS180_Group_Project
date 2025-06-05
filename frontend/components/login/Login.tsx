@@ -15,7 +15,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/login", {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
