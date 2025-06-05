@@ -38,7 +38,9 @@ const EditProfile = () => {
           return;
         }
 
-        const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/get/${userId}`);
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_SERVER_IP}/get/${userId}`,
+        );
         if (response.ok) {
           const data = await response.json();
           setFullName(data.fullname);
@@ -101,13 +103,16 @@ const EditProfile = () => {
         console.error("User ID not found");
         return;
       }
-      const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/update/${userId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_SERVER_IP}/update/${userId}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
         },
-        body: JSON.stringify(userData),
-      });
+      );
 
       if (response.ok) {
         Alert.alert("Success", "Profile updated successfully!");

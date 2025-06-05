@@ -15,13 +15,16 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_SERVER_IP}/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }),
         },
-        body: JSON.stringify({ username, password }),
-      });
+      );
 
       if (response.ok) {
         const data = await response.json();

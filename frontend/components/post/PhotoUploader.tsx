@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { View, Text, Button, Image, Alert, TouchableOpacity, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  Image,
+  Alert,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AWS from "aws-sdk";
@@ -25,8 +33,8 @@ const PhotoUploader = () => {
     });
 
     if (!result.canceled) {
-      const newUris = result.assets.map(asset => asset.uri);
-      setImageUris(prev => [...prev, ...newUris]);
+      const newUris = result.assets.map((asset) => asset.uri);
+      setImageUris((prev) => [...prev, ...newUris]);
     }
   };
 
@@ -61,16 +69,19 @@ const PhotoUploader = () => {
         const uploadResult = await s3.upload(s3Params).promise();
         console.log("Image uploaded successfully:", uploadResult.Location);
 
-        const backendResponse = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/add_post`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const backendResponse = await fetch(
+          `${process.env.EXPO_PUBLIC_SERVER_IP}/add_post`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_id: userId,
+              picture_link: uploadResult.Location,
+            }),
           },
-          body: JSON.stringify({
-            user_id: userId,
-            picture_link: uploadResult.Location,
-          }),
-        });
+        );
 
         if (!backendResponse.ok) {
           const errorData = await backendResponse.json();
@@ -90,7 +101,7 @@ const PhotoUploader = () => {
   };
 
   const removePhoto = (index: number) => {
-    setImageUris(prev => prev.filter((_, i) => i !== index));
+    setImageUris((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -118,7 +129,11 @@ const PhotoUploader = () => {
               }}
               onPress={() => removePhoto(index)}
             >
-              <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>X</Text>
+              <Text
+                style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
+              >
+                X
+              </Text>
             </TouchableOpacity>
           </View>
         )}

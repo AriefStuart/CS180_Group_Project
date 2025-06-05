@@ -12,17 +12,20 @@ const CreateProfile = () => {
   const handleSubmit = async () => {
     if (fullName && username && password) {
       try {
-        const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_IP}/add`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_SERVER_IP}/add`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              fullname: fullName,
+              username: username,
+              password: password,
+            }),
           },
-          body: JSON.stringify({
-            fullname: fullName,
-            username: username,
-            password: password,
-          }),
-        });
+        );
 
         if (response.ok) {
           const data = await response.json();
