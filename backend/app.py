@@ -181,6 +181,7 @@ def remove_friend(user_id, friend_id):
     return jsonify({"message": f"{friend.username} removed from friends"}), 200
 
 
+
 # Route to get all friends of a user
 @app.route("/get_friends/<user_id>/", methods=["GET"])
 def get_friends(user_id):

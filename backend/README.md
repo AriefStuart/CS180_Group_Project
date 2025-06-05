@@ -15,18 +15,21 @@ This is the backend for the CS180_Group_Project, built using Flask and SQLite. T
 ## Setup Instructions
 
 1. **Clone the repository**:
+
    ```bash
    git clone <repository-url>
    cd CS180_Group_Project/backend
    ```
 
 2. **Create a virtual environment** (optional but recommended):
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
    ```
 
 3. **Install the required dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -35,8 +38,8 @@ This is the backend for the CS180_Group_Project, built using Flask and SQLite. T
    ```bash
    python app.py
    ```
-
-The backend will start running on `http://127.0.0.1:5000/` by default.
+   python
+   The backend will start running on `http://127.0.0.1:5000/` by default.
 
 ## Usage
 

@@ -9,18 +9,27 @@ import {
 import { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import FriendDisplay from "./FriendDisplay";
 
 interface User {
   id: number;
   username: string;
-  isFriend: boolean; // Indicates whether the user is already a friend
+  name: string;
+  profilePicture: string;
+  friendStatus:
+    | "Friend Add"
+    | "Friend Result"
+    | "Friend Request"
+    | "Friend Request Sent";
 }
 
+const DEFAULT_PROFILE_PICTURE = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+
 const FriendSearch = () => {
-  const [searchQuery, setSearchQuery] = useState(""); // State to store the search query
-  const [userId, setUserId] = useState<number | null>(null); // Current user's ID
-  const [users, setUsers] = useState<User[]>([]); // State to store all users
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]); // State to store filtered users
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [userId, setUserId] = useState<number | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
 
   // Fetch the current user's ID from AsyncStorage
   useEffect(() => {
@@ -48,13 +57,24 @@ const FriendSearch = () => {
 
         try {
           const response = await fetch(
-            `http://127.0.0.1:5000/get_users_excluding_me?user_id=${userId}`,
-          ); // Pass userId as a query parameter
+            `http://127.0.0.1:5000/get_users_excluding_me?user_id=${userId}`
+          );
           if (response.ok) {
             const data = await response.json();
-            console.log("Fetched users:", data);
-            setUsers(data); // Set the users from the backend
-            setFilteredUsers(data); // Initially, all users are displayed
+            console.log("Raw fetched users:", data);
+            
+            // Validate and transform the data
+            const validatedUsers = data.map((user: any) => ({
+              id: user.id || 0,
+              username: user.username || "unknown",
+              name: user.name || "Unknown User",
+              profilePicture: user.profilePicture || DEFAULT_PROFILE_PICTURE,
+              friendStatus: user.friendStatus || "Friend Add"
+            }));
+            
+            console.log("Validated users:", validatedUsers);
+            setUsers(validatedUsers);
+            setFilteredUsers(validatedUsers);
           } else {
             console.error("Failed to fetch users");
             Alert.alert("Error", "Failed to fetch users.");
@@ -66,50 +86,64 @@ const FriendSearch = () => {
       };
 
       fetchUsers();
-    }, [userId]),
+    }, [userId])
   );
 
   // Update filtered users when the search query changes
   useEffect(() => {
     setFilteredUsers(
       users.filter((user) =>
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()),
-      ),
+        user.username.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     );
   }, [searchQuery, users]);
 
   // Handle adding or removing a friend
-  const toggleFriend = async (friendId: number, isFriend: boolean) => {
-    if (!userId) {
-      Alert.alert("Error", "User ID not available.");
-      return;
+  const toggleFriend = async (friendId: number, currentStatus: string) => {
+    if (!userId) return;
+
+    let endpoint = "";
+    let newStatus: User["friendStatus"] = currentStatus as User["friendStatus"];
+
+    switch (currentStatus) {
+      case "Friend Add":
+        endpoint = `http://127.0.0.1:5000/add_friend/${userId}/${friendId}/`;
+        newStatus = "Friend Request Sent";
+        break;
+      case "Friend Request Sent":
+      case "Friend Result":
+        endpoint = `http://127.0.0.1:5000/remove_friend/${userId}/${friendId}/`;
+        newStatus = "Friend Add";
+        break;
+      case "Friend Request":
+        endpoint = `http://127.0.0.1:5000/accept_friend/${userId}/${friendId}/`;
+        newStatus = "Friend Result";
+        break;
+      default:
+        return;
     }
 
     try {
-      const endpoint = isFriend
-        ? `http://127.0.0.1:5000/remove_friend/${userId}/${friendId}/`
-        : `http://127.0.0.1:5000/add_friend/${userId}/${friendId}/`;
-
       const response = await fetch(endpoint, { method: "POST" });
 
       if (response.ok) {
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
-            user.id === friendId ? { ...user, isFriend: !isFriend } : user,
-          ),
+            user.id === friendId ? { ...user, friendStatus: newStatus } : user
+          )
         );
-        Alert.alert(
-          "Success",
-          isFriend
-            ? "Friend removed successfully!"
-            : "Friend added successfully!",
+        setFilteredUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === friendId ? { ...user, friendStatus: newStatus } : user
+          )
         );
+        Alert.alert("Success", "Friend status updated!");
       } else {
         Alert.alert("Error", "Failed to update friend status.");
       }
     } catch (error) {
-      console.error("Error toggling friend status:", error);
-      Alert.alert("Error", "An error occurred while updating friend status.");
+      console.error("Error:", error);
+      Alert.alert("Error", "Network error.");
     }
   };
 
@@ -120,25 +154,25 @@ const FriendSearch = () => {
         className="h-10 border border-gray-300 rounded-lg px-3 mb-4"
         placeholder="Search..."
         value={searchQuery}
-        onChangeText={(text) => setSearchQuery(text)} // Update search query
+        onChangeText={(text) => setSearchQuery(text)}
       />
+
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View className="flex-row justify-between items-center py-2 border-b border-gray-200">
-            <Text className="text-lg">{item.username}</Text>
-            <TouchableOpacity
-              className={`px-4 py-2 rounded-lg ${
-                item.isFriend ? "bg-red-500" : "bg-blue-500"
-              }`}
-              onPress={() => toggleFriend(item.id, item.isFriend)}
-            >
-              <Text className="text-white font-bold">
-                {item.isFriend ? "Remove Friend" : "Add Friend"}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <FriendDisplay
+            profilePicture={item.profilePicture || DEFAULT_PROFILE_PICTURE}
+            name={item.name || "Unknown User"}
+            username={item.username || "unknown"}
+            option={item.friendStatus || "Friend Add"}
+            onOptionPress={() => toggleFriend(item.id, item.friendStatus)}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <Text className="text-center text-gray-500 mt-4">
+            No users found
+          </Text>
         )}
       />
     </View>
