@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from "@google/genai";
+import Base64 from "base64-js";
 
 interface Post {
   picture_link: string;
@@ -22,6 +24,53 @@ const PostsGrid = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null); // State for the selected post
   const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [generatedComment, setGeneratedComment] = useState("");
+  const [generating, setGenerating] = useState(false);
+
+  const generateInstagramComment = async (imageUrl: string) => {
+    setGenerating(true);
+    setGeneratedComment("");
+
+    try {
+      console.log("Generating comment for image:", imageUrl);
+      const response = await fetch("https://corsproxy.io/?" + imageUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      const base64Image = Base64.fromByteArray(new Uint8Array(arrayBuffer));
+
+      const ai = new GoogleGenAI({
+        apiKey: process.env.EXPO_PUBLIC_GEMINI_KEY,
+      });
+
+      const contents = [
+        {
+          role: "user",
+          parts: [
+            { inlineData: { mimeType: "image/jpeg", data: base64Image } },
+            {
+              text: "Write a fun and engaging Instagram comment for this image.",
+            },
+          ],
+        },
+      ];
+
+      const stream = await ai.models.generateContentStream({
+        model: "gemini-2.0-flash",
+        contents,
+      });
+
+      let buffer: string[] = [];
+      for await (let chunk of stream) {
+        buffer.push(chunk.text!);
+      }
+
+      setGeneratedComment(buffer.join(""));
+    } catch (error) {
+      console.error("Error generating comment:", error);
+      setGeneratedComment("Failed to generate comment. Try again.");
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -122,6 +171,24 @@ const PostsGrid = () => {
               <Text className="text-white text-lg mt-4">
                 {selectedPost.like_count} Likes
               </Text>
+              <TouchableOpacity
+                onPress={() =>
+                  generateInstagramComment(selectedPost.picture_link)
+                }
+                className="mt-4 bg-blue-600 px-4 py-2 rounded-lg"
+              >
+                <Text className="text-white">
+                  {generating ? "Generating..." : "Generate Instagram Comment"}
+                </Text>
+              </TouchableOpacity>
+
+              {generatedComment !== "" && (
+                <View className="mt-4 px-4">
+                  <Text className="text-white text-center italic">
+                    {generatedComment}
+                  </Text>
+                </View>
+              )}
               <TouchableOpacity
                 onPress={closeModal}
                 className="mt-4 bg-gray-800 px-4 py-2 rounded-lg"

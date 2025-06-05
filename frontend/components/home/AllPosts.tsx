@@ -10,17 +10,19 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PhotoCarousel from "@/components/post/PhotoCarousel";
 
-interface Post {
-  post_id: number;
+interface PostSet {
+  post_set_id: number;
   user_id: number;
-  picture_link: string;
-  like_count: number;
-  liked: boolean;
+  photos: string[];
+  like_counts: number[];
+  post_ids: number[];
+  liked: boolean[];
 }
 
 const AllPosts = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [postSets, setPostSets] = useState<PostSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<number | null>(null);
 
@@ -50,45 +52,42 @@ const AllPosts = () => {
           );
           if (response.ok) {
             const data = await response.json();
-            console.log("Fetched posts:", data);
-            setPosts(data); // Store the posts from the backend
+            setPostSets(data); // Store the post sets from the backend
           } else {
-            console.error("Failed to fetch posts");
             Alert.alert("Error", "Failed to fetch posts.");
           }
         } catch (error) {
-          console.error("Error fetching posts:", error);
           Alert.alert("Error", "An error occurred while fetching posts.");
         }
       };
 
-      const fetchLikedPosts = async () => {
-        if (!userId) return;
+      // const fetchLikedPosts = async () => {
+      //   if (!userId) return;
 
-        try {
-          const response = await fetch(
-            `${process.env.EXPO_PUBLIC_SERVER_IP}/get_liked_posts/${userId}`,
-          );
-          if (response.ok) {
-            const likedPostIds: number[] = await response.json();
-            setPosts((prevPosts) =>
-              prevPosts.map((post) => ({
-                ...post,
-                liked: likedPostIds.includes(post.post_id), // Mark posts as liked if they are in the likedPostIds array
-              })),
-            );
-          } else {
-            console.error("Failed to fetch liked posts");
-          }
-        } catch (error) {
-          console.error("Error fetching liked posts:", error);
-        }
-      };
+      //   try {
+      //     const response = await fetch(
+      //       `${process.env.EXPO_PUBLIC_SERVER_IP}/get_liked_posts/${userId}`,
+      //     );
+      //     if (response.ok) {
+      //       const likedPostIds: number[] = await response.json();
+      //       setPosts((prevPosts) =>
+      //         prevPosts.map((post) => ({
+      //           ...post,
+      //           liked: likedPostIds.includes(post.post_id), // Mark posts as liked if they are in the likedPostIds array
+      //         })),
+      //       );
+      //     } else {
+      //       console.error("Failed to fetch liked posts");
+      //     }
+      //   } catch (error) {
+      //     console.error("Error fetching liked posts:", error);
+      //   }
+      // };
 
       const initialize = async () => {
         await fetchUserId();
         await fetchPostsForUserAndFriends();
-        await fetchLikedPosts();
+        // await fetchLikedPosts();
         setLoading(false);
       };
 
@@ -96,33 +95,26 @@ const AllPosts = () => {
     }, [userId]),
   );
 
-  const toggleLike = async (post_id: number) => {
+  const toggleLike = async (
+    post_id: number,
+    setIndex: number,
+    photoIndex: number,
+  ) => {
     try {
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_SERVER_IP}/toggle_like/${post_id}/${userId}/`,
-        {
-          method: "POST",
-        },
+        { method: "POST" },
       );
       if (response.ok) {
-        const updatedPost = await response.json();
-        setPosts((prevPosts) =>
-          prevPosts.map((post) =>
-            post.post_id === post_id
-              ? {
-                  ...post,
-                  like_count: updatedPost.like_count,
-                  liked: updatedPost.liked,
-                }
-              : post,
-          ),
-        );
-      } else {
-        console.error("Failed to toggle like");
-        Alert.alert("Error", "Failed to toggle like.");
+        const updated = await response.json();
+        setPostSets((prev) => {
+          const updatedSets = [...prev];
+          updatedSets[setIndex].like_counts[photoIndex] = updated.like_count;
+          updatedSets[setIndex].liked[photoIndex] = updated.liked;
+          return updatedSets;
+        });
       }
     } catch (error) {
-      console.error("Error toggling like:", error);
       Alert.alert("Error", "An error occurred while toggling like.");
     }
   };
@@ -135,7 +127,7 @@ const AllPosts = () => {
     );
   }
 
-  if (posts.length === 0) {
+  if (postSets.length === 0) {
     return (
       <View className="flex-1 justify-center items-center">
         <Text className="text-lg">No posts to display.</Text>
@@ -143,27 +135,21 @@ const AllPosts = () => {
     );
   }
 
-  const screenWidth = Dimensions.get("window").width;
-
   return (
     <FlatList
-      data={posts}
-      keyExtractor={(item) => item.post_id.toString()}
-      renderItem={({ item }) => (
-        <View className="mb-4">
-          <Image
-            source={{ uri: item.picture_link }}
-            style={{ width: screenWidth, height: screenWidth }}
-            className="rounded-lg"
+      data={postSets}
+      keyExtractor={(item) => item.post_set_id.toString()}
+      renderItem={({ item, index: setIndex }) => (
+        <View className="mb-8">
+          <PhotoCarousel
+            photos={item.photos}
+            likeCounts={item.like_counts}
+            liked={item.liked}
+            postIds={item.post_ids}
+            onToggleLike={(photoIndex: number) =>
+              toggleLike(item.post_ids[photoIndex], setIndex, photoIndex)
+            }
           />
-          <View className="flex-row justify-between items-center mt-2 px-4">
-            <TouchableOpacity onPress={() => toggleLike(item.post_id)}>
-              <Text className={`text-${item.liked ? "red" : "blue"}-500`}>
-                {item.liked ? "Unlike" : "Like"}
-              </Text>
-            </TouchableOpacity>
-            <Text className="text-gray-700">{item.like_count} Likes</Text>
-          </View>
         </View>
       )}
       className="p-4"
