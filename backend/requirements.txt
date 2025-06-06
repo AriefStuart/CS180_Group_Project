@@ -8,3 +8,5 @@ flask-cors
 boto3
 black
 sqlalchemy
+pytest
+pytest-flask
