@@ -13,6 +13,8 @@ const ProfileTop = () => {
   const [profileImage, setProfileImage] = useState(DefaultProfilePic);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [postCount, setPostCount] = useState(0);
+  const [friendCount, setFriendCount] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -24,6 +26,7 @@ const ProfileTop = () => {
             return;
           }
 
+          // Fetch user profile
           const response = await fetch(
             `${process.env.EXPO_PUBLIC_SERVER_IP}/get/${userId}`,
           );
@@ -35,6 +38,18 @@ const ProfileTop = () => {
             setProfileImage(data.profile_picture || DefaultProfilePic);
           } else {
             console.error("Failed to fetch user data");
+          }
+
+          // Fetch counts
+          const countsResponse = await fetch(
+            `${process.env.EXPO_PUBLIC_SERVER_IP}/get_counts/${userId}/`,
+          );
+          if (countsResponse.ok) {
+            const countsData = await countsResponse.json();
+            setPostCount(countsData.post_count);
+            setFriendCount(countsData.friend_count);
+          } else {
+            console.error("Failed to fetch counts");
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -101,11 +116,11 @@ const ProfileTop = () => {
       </Link>
       <View className="flex-row justify-around w-full mt-5">
         <View className="items-center">
-          <Text className="text-3xl font-bold">42</Text>
+          <Text className="text-3xl font-bold">{postCount}</Text>
           <Text className="text-app-primary text-base font-bold">Posts</Text>
         </View>
         <View className="items-center">
-          <Text className="text-3xl font-bold">36</Text>
+          <Text className="text-3xl font-bold">{friendCount}</Text>
           <Text className="text-app-primary text-base font-bold">Friends</Text>
         </View>
       </View>
