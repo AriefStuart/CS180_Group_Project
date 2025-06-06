@@ -94,6 +94,20 @@ class Likes(db.Model):
         self.post_id = post_id
 
 
+@app.route("/get_counts/<user_id>/", methods=["GET"])
+def get_counts(user_id):
+    user = Users.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    friend_count = len(user.friends)
+    post_count = Posts.query.filter_by(user_id=user_id).count()
+
+    return jsonify(
+        {"user_id": user_id, "friend_count": friend_count, "post_count": post_count}
+    )
+
+
 @app.route("/get_posts_for_user_and_friends/<user_id>", methods=["GET"])
 def get_posts_for_user_and_friends(user_id):
     user = Users.query.get(user_id)
